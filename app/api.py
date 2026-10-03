@@ -22,13 +22,16 @@ def ingest(file: UploadFile = File(...)):
         path = tmp.name
     try:
         return ingest_pdf(path, file.filename)
+    except Exception as exc:
+        _fail(exc)
     finally:
         os.remove(path)
 
 
 def _fail(exc):
     code = 429 if "429" in str(exc) else 500
-    raise HTTPException(status_code=code, detail=str(exc)[:500])
+    raise HTTPException(status_code=code,
+                        detail=f"{type(exc).__name__}: {str(exc)[:500]}")
 
 
 @api.post("/ask/hybrid")

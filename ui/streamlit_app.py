@@ -16,10 +16,17 @@ if pdf and st.button("Ingest"):
     else:
         st.session_state["doc"] = r.json()
 
+existing = st.text_input("Or use an already-ingested document ID")
+if existing and st.button("Use this document"):
+    st.session_state["doc"] = {"doc_id": existing.strip(), "filename": "existing document"}
+
 doc = st.session_state.get("doc")
 if doc:
-    st.success(f"{doc['filename']}: {doc['tables']} tables, {doc['table_rows']} rows, "
-               f"{doc['text_chunks']} text chunks")
+    if "tables" in doc:
+        st.success(f"{doc['filename']}: {doc['tables']} tables, {doc['table_rows']} rows, "
+                   f"{doc['text_chunks']} text chunks")
+    else:
+        st.success(f"Using document {doc['doc_id']}")
     question = st.text_input("Ask a question about the document")
     if question:
         body = {"doc_id": doc["doc_id"], "question": question}
