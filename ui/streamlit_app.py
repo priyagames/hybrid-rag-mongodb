@@ -11,7 +11,9 @@ if pdf and st.button("Ingest"):
     with st.spinner("Parsing, embedding and storing in MongoDB..."):
         r = requests.post(f"{API}/ingest", timeout=900,
                           files={"file": (pdf.name, pdf.getvalue(), "application/pdf")})
-        r.raise_for_status()
+    if r.status_code != 200:
+        st.error(f"Ingest failed ({r.status_code}): {r.text[:500]}")
+    else:
         st.session_state["doc"] = r.json()
 
 doc = st.session_state.get("doc")
